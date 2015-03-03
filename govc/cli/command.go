@@ -24,6 +24,7 @@ import (
 	"reflect"
 	"sort"
 	"text/tabwriter"
+	"github.com/vmware/govmomi/govc/autocli"
 )
 
 type HasFlags interface {
@@ -116,7 +117,32 @@ func commandHelp(name string, cmd Command, f *flag.FlagSet) {
 	}
 }
 
+func RunAutocomplete() {
+ 	app := autocli.NewApp()
+ 	app.EnableBashCompletion = true
+	
+	cmds := []string{}
+        for name := range commands {
+                cmds = append(cmds, name)
+        }
+
+        sort.Strings(cmds)
+
+	test := make ([]autocli.Command,len(cmds))
+	for i := 0; i < len(cmds); i++{
+       		test[i].Name = cmds[i]
+      	} 
+	app.Commands = test
+	app.Run(os.Args)
+}
+
 func Run(args []string) int {
+	
+/*	if os.Getenv("COMPGEN") != "" {
+		RunAutocomplete()
+		return 1
+	}
+*/
 	if len(args) == 0 {
 		generalHelp()
 		return 1
@@ -136,7 +162,7 @@ func Run(args []string) int {
 
 	f := flag.NewFlagSet("", flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
-
+	
 	RegisterCommand(cmd, f)
 
 	if err := f.Parse(args[1:]); err != nil {

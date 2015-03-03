@@ -18,9 +18,8 @@ package main
 
 import (
 	"os"
-
 	"github.com/vmware/govmomi/govc/cli"
-
+	
 	_ "github.com/vmware/govmomi/govc/about"
 	_ "github.com/vmware/govmomi/govc/datacenter"
 	_ "github.com/vmware/govmomi/govc/datastore"
@@ -45,5 +44,9 @@ import (
 )
 
 func main() {
+	if os.Getenv("COMPGEN") != "" {
+               cli.RunAutocomplete()
+        } else {	
 	os.Exit(cli.Run(os.Args[1:]))
+	}	
 }
